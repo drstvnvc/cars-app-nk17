@@ -12,7 +12,8 @@ function SingleCar({
   is_automatic,
   engine,
   number_of_doors,
-  deleteCallback,
+  isSelected,
+  onSelect,
 }) {
   const dispatch = useDispatch();
   const history = useHistory();
@@ -36,7 +37,7 @@ function SingleCar({
   return (
     <li
       style={{
-        border: "1px solid black",
+        border: "1px solid " + (isSelected ? "red" : "black"),
         marginBottom: "5px",
         padding: 5,
         display: "flex",
@@ -52,6 +53,7 @@ function SingleCar({
       <span>Number of doors: {number_of_doors}</span>
       <button onClick={() => handleDelete()}>Delete</button>
       <button onClick={() => handleEdit()}>Edit</button>
+      <button onClick={() => onSelect()}>Select</button>
     </li>
   );
 }
