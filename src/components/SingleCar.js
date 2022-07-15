@@ -1,4 +1,7 @@
 import React from "react";
+import { useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
+import { deleteCar } from "../store/cars";
 
 function SingleCar({
   id,
@@ -10,8 +13,26 @@ function SingleCar({
   engine,
   number_of_doors,
   deleteCallback,
-  editCallback,
 }) {
+  const dispatch = useDispatch();
+  const history = useHistory();
+
+  const handleEdit = () => {
+    history.push(`edit/${id}`);
+  };
+
+  const handleDelete = async () => {
+    const response = prompt(
+      "Are you sure you want to delete this car ?\n Enter 'Yes' if you are"
+    );
+
+    if (response !== "Yes") {
+      return;
+    }
+
+    dispatch(deleteCar(id));
+  };
+
   return (
     <li
       style={{
@@ -29,8 +50,8 @@ function SingleCar({
       <span>{is_automatic ? "Is" : "Not"} Automatic </span>
       <span>Engine: {engine}</span>
       <span>Number of doors: {number_of_doors}</span>
-      <button onClick={() => deleteCallback(id)}>Delete</button>
-      <button onClick={() => editCallback(id)}>Edit</button>
+      <button onClick={() => handleDelete()}>Delete</button>
+      <button onClick={() => handleEdit()}>Edit</button>
     </li>
   );
 }

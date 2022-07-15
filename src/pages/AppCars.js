@@ -1,57 +1,28 @@
-import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import SingleCar from "../components/SingleCar";
-import carService from "../services/CarService";
+import { getCars, selectCars } from "../store/cars";
 
 function AppCars() {
-  const [cars, setCars] = useState({
-    current_page: 1,
-    data: [],
-  });
-  const history = useHistory();
+  const dispatch = useDispatch();
 
-  const handleDelete = async (carId) => {
-    const response = prompt(
-      "Are you sure you want to delete this car ?\n Enter 'Yes' if you are"
-    );
-
-    if (response !== "Yes") {
-      return;
-    }
-
-    const data = await carService.delete(carId);
-
-    if (data.count > 0) {
-      setCars(cars.filter(({ id }) => id !== carId));
-    }
-  };
-
-  const handleEdit = (id) => {
-    history.push(`edit/${id}`);
-  };
+  const cars = useSelector(selectCars);
 
   useEffect(() => {
-    const fetchCars = async () => {
-      const data = await carService.getAll();
-
-      setCars(data);
-    };
-    fetchCars();
+    dispatch(getCars());
   }, []);
 
   return (
     <div>
       <h2>Cars</h2>
-      <ul>
-        {cars.data.map((car) => (
-          <SingleCar
-            {...car}
-            key={car.id}
-            deleteCallback={handleDelete}
-            editCallback={handleEdit}
-          />
-        ))}
-      </ul>
+      {cars.data.length > 0 && (
+        <ul>
+          {cars.data.map((car) => (
+            <SingleCar {...car} key={car.id} />
+          ))}
+        </ul>
+      )}
+      {cars.data.length == 0 && <p>No cars</p>}
     </div>
   );
 }

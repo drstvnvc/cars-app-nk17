@@ -1,47 +1,69 @@
-import React, { useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
-import carService from '../services/CarService';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory, useParams } from "react-router-dom";
+
+import { addCar, getCar, selectCar, updateCar } from "../store/cars";
 
 const YEARS = Array(2018 - 1990 + 1)
   .fill(1990)
   .map((el, index) => el + index);
 
-const ENGINES = ['diesel', 'petrol', 'electric', 'hybrid'];
+const ENGINES = ["diesel", "petrol", "electric", "hybrid"];
 
 function AddCar() {
+  const dispatch = useDispatch();
   const history = useHistory();
   const { id } = useParams();
 
+  const car = useSelector(selectCar);
+
   const [newCar, setNewCar] = useState({
-    brand: '',
-    model: '',
+    brand: "",
+    model: "",
     year: YEARS[0],
-    max_speed: '',
-    number_of_doors: '',
+    max_speed: "",
+    number_of_doors: "",
     is_automatic: false,
-    engine: '',
+    engine: "",
   });
+
+  function handleActionSuccess() {
+    history.push("/cars");
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (id) {
-      await carService.edit(id, newCar);
+      dispatch(
+        updateCar({
+          id,
+          car: newCar,
+          meta: {
+            onSuccess: handleActionSuccess,
+          },
+        })
+      );
     } else {
-      await carService.add(newCar);
+      dispatch(
+        addCar({
+          car: newCar,
+          meta: {
+            onSuccess: handleActionSuccess,
+          },
+        })
+      );
     }
-
-    history.push('/cars');
   };
 
   const handleReset = () => {
     setNewCar({
-      brand: '',
-      model: '',
+      brand: "",
+      model: "",
       year: YEARS[0],
-      max_speed: '',
-      number_of_doors: '',
+      max_speed: "",
+      number_of_doors: "",
       is_automatic: false,
-      engine: '',
+      engine: "",
     });
   };
 
@@ -52,22 +74,23 @@ function AddCar() {
       Year: ${newCar.year} \n
       Max speed: ${newCar.max_speed} \n
       Number of doors: ${newCar.number_of_doors} \n
-      Is Automatic: ${newCar.is_automatic ? 'Yes' : 'No'} \n
+      Is Automatic: ${newCar.is_automatic ? "Yes" : "No"} \n
       Engine: ${newCar.engine} \n
     `);
   };
 
   useEffect(() => {
-    const fetchCar = async () => {
-      const { id: _, ...restData } = await carService.get(id);
-
-      setNewCar({ ...restData });
-    };
-
     if (id) {
-      fetchCar();
+      dispatch(getCar(id));
     }
   }, [id]);
+
+  useEffect(() => {
+    console.log("car updated", { car });
+    if (car) {
+      setNewCar({ ...car });
+    }
+  }, [car]);
 
   return (
     <div>
@@ -75,28 +98,28 @@ function AddCar() {
       <form
         onSubmit={handleSubmit}
         style={{
-          display: 'flex',
-          flexDirection: 'column',
+          display: "flex",
+          flexDirection: "column",
           width: 200,
           marginLeft: 15,
         }}
       >
         <input
           required
-          type='text'
-          minLength='2'
+          type="text"
+          minLength="2"
           value={newCar.brand}
-          placeholder='Brand'
+          placeholder="Brand"
           onChange={({ target }) =>
             setNewCar({ ...newCar, brand: target.value })
           }
         />
         <input
           required
-          type='text'
-          minLength='2'
+          type="text"
+          minLength="2"
           value={newCar.model}
-          placeholder='Model'
+          placeholder="Model"
           onChange={({ target }) =>
             setNewCar({ ...newCar, model: target.value })
           }
@@ -115,20 +138,20 @@ function AddCar() {
           ))}
         </select>
         <input
-          type='number'
-          min='1'
+          type="number"
+          min="1"
           value={newCar.max_speed}
-          placeholder='Max speed'
+          placeholder="Max speed"
           onChange={({ target }) =>
             setNewCar({ ...newCar, max_speed: target.value })
           }
         />
         <input
           required
-          type='number'
-          min='1'
+          type="number"
+          min="1"
           value={newCar.number_of_doors}
-          placeholder='Number of door'
+          placeholder="Number of door"
           onChange={({ target }) =>
             setNewCar({ ...newCar, number_of_doors: target.value })
           }
@@ -136,7 +159,7 @@ function AddCar() {
         <span>
           <label>Is automatic?</label>
           <input
-            type='checkbox'
+            type="checkbox"
             checked={newCar.is_automatic}
             onChange={({ target }) => {
               setNewCar({ ...newCar, is_automatic: target.checked });
@@ -144,13 +167,13 @@ function AddCar() {
           />
         </span>
 
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <h4>Pick engine:</h4>
           {ENGINES.map((engine, index) => (
             <span key={index}>
               <input
-                type='radio'
-                name='engine'
+                type="radio"
+                name="engine"
                 required
                 checked={engine === newCar.engine}
                 value={engine}
@@ -161,11 +184,11 @@ function AddCar() {
           ))}
         </div>
         <div>
-          <button>{id ? 'Edit' : 'Add new'}</button>
-          <button type='button' onClick={handleReset}>
+          <button>{id ? "Edit" : "Add new"}</button>
+          <button type="button" onClick={handleReset}>
             Reset
           </button>
-          <button type='button' onClick={handlePreview}>
+          <button type="button" onClick={handlePreview}>
             Preview
           </button>
         </div>

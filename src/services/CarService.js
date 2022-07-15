@@ -1,71 +1,45 @@
-import axios from 'axios';
+import axios from "axios";
 
 class CarService {
   constructor() {
     this.client = axios.create({
-      baseURL: 'http://localhost:8000/api',
+      baseURL: "http://localhost:8000/api",
     });
   }
 
-  async getAll() {
-    try {
-      const { data } = await this.client.get('cars');
+  getAll = async (queryParameters) => {
+    let params = [];
 
-      return data;
-    } catch (error) {
-      console.log(error);
+    for (const param in queryParameters) {
+      if (queryParameters[param]) {
+        params.push(`${param}=${queryParameters[param]}`);
+      }
     }
+    const { data } = await this.client.get("cars?" + params.join("&"));
 
-    return [];
-  }
+    return data;
+  };
 
-  async add(newCar) {
-    try {
-      const { data } = await this.client.post('cars', newCar);
+  add = async (newCar) => {
+    const { data } = await this.client.post("cars", newCar);
+    return data;
+  };
 
-      return data;
-    } catch (error) {
-      console.log(error);
-    }
+  delete = async (carId) => {
+    const { data } = await this.client.delete(`cars/${carId}`);
 
-    return null;
-  }
+    return data;
+  };
 
-  async delete(carId) {
-    try {
-      const { data } = await this.client.delete(`cars/${carId}`);
+  get = async (id) => {
+    const { data } = await this.client.get(`cars/${id}`);
+    return data;
+  };
 
-      return data;
-    } catch (error) {
-      console.log(error);
-    }
-
-    return {};
-  }
-
-  async get(id) {
-    try {
-      const { data } = await this.client.get(`cars/${id}`);
-
-      return data;
-    } catch (error) {
-      console.log(error);
-    }
-
-    return {};
-  }
-
-  async edit(id, newCar) {
-    try {
-      const { data } = await this.client.put(`cars/${id}`, newCar);
-
-      return data;
-    } catch (error) {
-      console.log(error);
-    }
-
-    return null;
-  }
+  edit = async (id, newCar) => {
+    const { data } = await this.client.put(`cars/${id}`, newCar);
+    return data;
+  };
 }
 
 export default new CarService();
