@@ -1,2 +1,10 @@
-export { getCars, deleteCar, addCar, updateCar, getCar } from "./slice";
+export {
+  getCars,
+  deleteCar,
+  addCar,
+  updateCar,
+  getCar,
+  setFilters,
+  setSort,
+} from "./slice";
 export * from "./selectors";

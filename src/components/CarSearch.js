@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { getCars } from "../store/cars";
+import { setFilters } from "../store/cars";
 
 export default function CarSearch() {
   const dispatch = useDispatch();
@@ -11,7 +11,7 @@ export default function CarSearch() {
   });
 
   useEffect(() => {
-    dispatch(getCars(searchTerms));
+    dispatch(setFilters(searchTerms));
   }, [searchTerms]);
 
   return (

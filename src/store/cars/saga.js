@@ -1,4 +1,4 @@
-import { takeLatest, call, put } from "redux-saga/effects";
+import { takeLatest, call, put, select } from "redux-saga/effects";
 import {
   addCar,
   deleteCar,
@@ -8,15 +8,26 @@ import {
   setCars,
   setCar,
   updateCar,
+  setFilters,
+  setSort,
+  appendCars,
 } from "./slice";
 
 import carService from "../../services/CarService";
+import { selectFilters, selectSort } from "./selectors";
 
 // workers
 function* getCarsHandler({ payload }) {
+  const filters = yield select(selectFilters);
+  const sort = yield select(selectSort);
+
   try {
-    const cars = yield call(carService.getAll, payload);
-    yield put(setCars(cars));
+    const cars = yield call(carService.getAll, payload?.page, filters, sort);
+    if (payload?.page > 1) {
+      yield put(appendCars(cars));
+    } else {
+      yield put(setCars(cars));
+    }
   } catch (e) {
     console.log(e);
   }
@@ -76,4 +87,10 @@ export function* watchAddCar() {
 }
 export function* watchUpdateCar() {
   yield takeLatest(updateCar.type, updateCarHandler);
+}
+export function* watchFilterCars() {
+  yield takeLatest(setFilters.type, getCarsHandler);
+}
+export function* watchSortCars() {
+  yield takeLatest(setSort.type, getCarsHandler);
 }

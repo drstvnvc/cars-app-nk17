@@ -7,12 +7,21 @@ class CarService {
     });
   }
 
-  getAll = async (queryParameters) => {
+  getAll = async (page, queryParameters, sort) => {
     let params = [];
-
+    if (page) {
+      params.push(`page=${page}`);
+    }
     for (const param in queryParameters) {
       if (queryParameters[param]) {
         params.push(`${param}=${queryParameters[param]}`);
+      }
+    }
+
+    if (sort?.criteria) {
+      params.push(`sort_by=${sort.criteria}`);
+      if (sort.order) {
+        params.push(`sort_order=${sort.order}`);
       }
     }
     const { data } = await this.client.get("cars?" + params.join("&"));
